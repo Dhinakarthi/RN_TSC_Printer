@@ -7,6 +7,10 @@ const App = () => {
     console.log('bluetoothAvailable', BlutoothModule.bluetoothAvailable());
     console.log('bluetoothLEAvailable', BlutoothModule.bluetoothLEAvailable());
     console.log('checkBluetoothAdapter', BlutoothModule.checkBluetoothAdapter());
+    BlutoothModule.checkBluetoothEnabled()
+    BlutoothModule.getPairedDevices().then(
+      response => console.log('PairedDevice', response)
+    ).catch(error => console.log('Error', error));
   }, []);
 
   return (
