@@ -13,6 +13,12 @@ const App = () => {
     ).catch(error => console.log('Error', error));
   }, []);
 
+  useEffect(() => {
+    return () => {
+      BlutoothModule.stopDiscovery();
+    }
+  }, []);
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity

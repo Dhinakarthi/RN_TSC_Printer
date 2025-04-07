@@ -93,6 +93,44 @@ public class BlutoothModule extends ReactContextBaseJavaModule {
         promise.resolve(deviceList);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    @ReactMethod
+    public void startDiscovery(){
+        Activity currentActivity = getCurrentActivity();
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter != null && adapter.isEnabled()){
+            if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                assert currentActivity != null;
+                ActivityCompat.requestPermissions(
+                        currentActivity,
+                        new String[]{android.Manifest.permission.BLUETOOTH_CONNECT},
+                        101 // Request code you can handle in onRequestPermissionsResult
+                );
+                return;
+            }
+            bluetoothAdapter.startDiscovery();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    @ReactMethod
+    public void stopDiscovery() {
+        Activity currentActivity = getCurrentActivity();
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            assert currentActivity != null;
+            ActivityCompat.requestPermissions(
+                    currentActivity,
+                    new String[]{android.Manifest.permission.BLUETOOTH_CONNECT},
+                    101 // Request code you can handle in onRequestPermissionsResult
+            );
+            return;
+        }
+        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+    }
+
 
     @ReactMethod
     public String checkBluetoothAdapter() {
