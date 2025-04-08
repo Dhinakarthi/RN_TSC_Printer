@@ -1,5 +1,6 @@
 package com.rn_tsc_printer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import com.example.tscdll.TSCActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -28,6 +30,39 @@ public class BlutoothModule extends ReactContextBaseJavaModule {
     BluetoothManager bluetoothManager = getReactApplicationContext().getSystemService(BluetoothManager.class);
     BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
     private static final Integer REQUEST_ENABLE_BT = 1;
+
+    private TSCActivity bt_api;
+
+    @Override
+    public void initialize(){
+        super.initialize();
+        bt_api = new TSCActivity();
+    }
+
+    @ReactMethod
+    public void TSCPrintLabel(){
+        bt_api.openport("34:81:F4:9C:DE:53");
+        String printer_status = bt_api.status();
+        Log.v("printer_status", printer_status);
+
+        bt_api.sendcommand("SIZE 75 mm, 50 mm\r\n");
+        bt_api.clearbuffer();
+        bt_api.sendcommand("SPEED 4\r\n");
+        bt_api.sendcommand("DENSITY 12\r\n");
+        bt_api.sendcommand("CODEPAGE UTF-8\r\n");
+        bt_api.sendcommand("SET TEAR ON\r\n");
+        bt_api.sendcommand("SET COUNTER @1 1\r\n");
+        bt_api.sendcommand("@1 = \"0001\"\r\n");
+        bt_api.sendcommand("TEXT 100,300,\"ROMAN.TTF\",0,12,12,@1\r\n");
+        bt_api.sendcommand("TEXT 100,400,\"ROMAN.TTF\",0,12,12,\"TEST FONT\"\r\n");
+        bt_api.barcode(100, 100, "128", 100, 1, 0, 3, 3, "123456789");
+        bt_api.printerfont(100, 250, "3", 0, 1, 1, "987654321");
+        bt_api.printlabel(2, 1);
+
+        bt_api.closeport(5000);
+        Toast.makeText(getReactApplicationContext(), "Status: "+printer_status, Toast.LENGTH_LONG).show();
+
+    }
 
     BlutoothModule(ReactApplicationContext context) {
         super(context);
@@ -102,7 +137,7 @@ public class BlutoothModule extends ReactContextBaseJavaModule {
                 assert currentActivity != null;
                 ActivityCompat.requestPermissions(
                         currentActivity,
-                        new String[]{android.Manifest.permission.BLUETOOTH_CONNECT},
+                        new String[]{android.Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
                         101 // Request code you can handle in onRequestPermissionsResult
                 );
                 return;

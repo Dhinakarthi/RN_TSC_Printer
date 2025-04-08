@@ -54,6 +54,12 @@ const App = () => {
         </View>
       </View>
       {isDiscovering && <Text style={{ flex: 1, marginTop: 20, fontSize: 16, textAlign: 'center' }}>Loading...</Text>}
+      <TouchableOpacity
+        style={{ padding: 15, backgroundColor: 'black', alignItems: 'center', borderRadius: 10, marginTop: 30 }}
+        onPress={() => {BlutoothModule.TSCPrintLabel()}}
+      >
+        <Text style={{ color: 'white', fontSize: 16 }}>Print</Text>
+      </TouchableOpacity>
     </View>
   )
 }
