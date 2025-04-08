@@ -1,32 +1,35 @@
-import { useEffect } from "react";
-import { Text, TouchableOpacity, View, NativeModules } from "react-native";
+import { useEffect, useState } from "react";
+import { Text, TouchableOpacity, View, NativeModules, FlatList } from "react-native";
 
 const App = () => {
   const { BlutoothModule } = NativeModules;
-  useEffect(() => {
-    console.log('bluetoothAvailable', BlutoothModule.bluetoothAvailable());
-    console.log('bluetoothLEAvailable', BlutoothModule.bluetoothLEAvailable());
-    console.log('checkBluetoothAdapter', BlutoothModule.checkBluetoothAdapter());
-    BlutoothModule.checkBluetoothEnabled()
-    BlutoothModule.getPairedDevices().then(
-      response => console.log('PairedDevice', response)
-    ).catch(error => console.log('Error', error));
-  }, []);
+
+  const [pairedDevice, setPairedDevice] = useState([]);
 
   useEffect(() => {
-    return () => {
-      BlutoothModule.stopDiscovery();
-    }
+    BlutoothModule.checkBluetoothEnabled();
+    BlutoothModule.getPairedDevices()
+      .then(device => setPairedDevice(device))
+      .catch(error => console.error(error));
   }, []);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity
-        style={{ padding: 10, backgroundColor: 'black', borderRadius: 10 }}
-        onPress={() => BlutoothModule.sampleToast('Success!!!')}
-      >
-        <Text style={{ color: 'white' }}>Click</Text>
-      </TouchableOpacity>
+    <View style={{ flex: 1, padding: 25 }}>
+      {pairedDevice && <View>
+        <Text style={{ fontSize: 20 }}>Paired Devices</Text>
+        <FlatList
+          data={pairedDevice}
+          keyExtractor={(item) => item?.address}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity style={{ marginVertical: 10, padding: 6, borderColor: 'black', borderWidth: 1, borderRadius: 10 }}>
+                <Text style={{ fontSize: 14, color: 'black', }}>{item?.name}</Text>
+                <Text style={{ fontSize: 12, color: 'black', marginTop: 5 }}>{item?.address}</Text>
+              </TouchableOpacity>
+            )
+          }}
+        />
+      </View>}
     </View>
   )
 }

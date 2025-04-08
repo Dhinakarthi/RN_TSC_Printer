@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,14 +24,13 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.Set;
 
 public class BlutoothModule extends ReactContextBaseJavaModule {
+    BluetoothManager bluetoothManager = getReactApplicationContext().getSystemService(BluetoothManager.class);
+    BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
     private static final Integer REQUEST_ENABLE_BT = 1;
 
     BlutoothModule(ReactApplicationContext context) {
         super(context);
     }
-
-    BluetoothManager bluetoothManager = getReactApplicationContext().getSystemService(BluetoothManager.class);
-    BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @ReactMethod
@@ -131,7 +129,6 @@ public class BlutoothModule extends ReactContextBaseJavaModule {
         }
     }
 
-
     @ReactMethod
     public String checkBluetoothAdapter() {
         if (bluetoothAdapter == null) {
@@ -161,6 +158,4 @@ public class BlutoothModule extends ReactContextBaseJavaModule {
     public boolean bluetoothLEAvailable() {
         return getReactApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
     }
-
-
 }
